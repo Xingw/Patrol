@@ -20,6 +20,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.BROADCAST_STICKY" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
 
     <application
         android:name=".util.MApplicatioin"
@@ -34,6 +35,7 @@
             android:name="com.thinkland.juheapi.openid"
             android:value="JHe4b1e1dd73ebd4a6255d96acc0a028d2" />
 
+        <meta-data android:value="19aa4fbc7a8239e6a460290df342b30b" android:name="BUG_HD_SDK_GENERAL_KEY" />
 
         <!--登陆Aty-->
         <activity

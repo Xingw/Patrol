@@ -13,8 +13,8 @@ android {
         applicationId "com.xunce.patrol"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
     }
     signingConfigs {
         debug {
@@ -69,4 +69,6 @@ dependencies {
     compile files('libs/uk-co-senab-photoview-source.jar')
     compile files('libs/juhe_sdk_v_2_7.jar')
     compile files('libs/BaiduLBS_Android.jar')
+
+    compile 'im.fir:sdk:1.2.0+'
 }
