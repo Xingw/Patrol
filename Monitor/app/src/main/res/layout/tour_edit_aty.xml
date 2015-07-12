@@ -14,15 +14,15 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:background="@drawable/click_selector"
             android:id="@+id/id_iv_back"
             android:layout_width="@dimen/actionbar_icon_width"
             android:layout_height="@dimen/actionbar_icon_height"
             android:layout_gravity="center_vertical"
+            android:background="@drawable/click_selector"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:scaleType="centerInside"
-            android:src="@drawable/back" />
+            android:src="@drawable/ic_action_back" />
 
         <TextView
             android:id="@+id/id_tv_ab_prjName"
@@ -363,10 +363,13 @@
             android:src="@drawable/more" />
     </LinearLayout>
 
+
     <include layout="@layout/lv_divider" />
-    <!--巡视轨迹-->
+
+
+    <!--gps-->
     <LinearLayout
-        android:id="@+id/id_ll_monitor_patroltrack"
+        android:id="@+id/id_ll_gps"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal">
@@ -381,22 +384,21 @@
             android:textSize="@dimen/tour_edit_text_size_normal" />
 
         <TextView
-            android:id="@+id/id_tv_monitor_patroltrack"
+            android:id="@+id/id_tv_gps_state"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:gravity="center_vertical|right"
-            android:text="未填写"
+            android:text="未记录"
             android:textSize="@dimen/tour_edit_text_size_normal" />
 
         <ImageView
-            android:id="@+id/id_iv_monitor_patroltrack"
+            android:id="@+id/id_iv_gps"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/tour_iv_more_height"
             android:layout_gravity="center"
             android:layout_marginRight="10dp"
             android:src="@drawable/more" />
     </LinearLayout>
-
 </LinearLayout>

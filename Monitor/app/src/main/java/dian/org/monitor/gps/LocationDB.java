@@ -8,14 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.baidu.mapapi.map.BaiduMap;
 import com.baidu.mapapi.model.LatLng;
 import com.baidu.mapapi.utils.DistanceUtil;
 
 import java.util.ArrayList;
 
-import dian.org.monitor.db.TourDbHelper;
-import dian.org.monitor.touritem.TourItem;
 
 public class LocationDB extends SQLiteOpenHelper {
     private static final String LOG_TAG = "LocationDB";
