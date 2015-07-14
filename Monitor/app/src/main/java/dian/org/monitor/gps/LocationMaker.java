@@ -19,8 +19,10 @@ public class LocationMaker implements BDLocationListener {
     private static final String LOG_TAG = "LocationMaker";
 
     private LocationClient mLocationClient;
-    private String patrol_name;
+    private int patrol_name;
+    private String project_name;
     private Context context;
+    private LocationDB db;
     /**
      * 生成位置的时间间隔,单位是 ms
      */
@@ -34,13 +36,15 @@ public class LocationMaker implements BDLocationListener {
      * @param intervalTime 记录位置的时间间隔
      * @param listener     位置生成后的回调
      */
-    public LocationMaker(Context context, int intervalTime, String patrol_name, LocationCreatedListener listener) {
+    public LocationMaker(Context context, int intervalTime, int patrol_name,String project_name, LocationCreatedListener listener) {
         this.intervalTime = intervalTime;
         this.context = context;
         this.patrol_name=patrol_name;
+        this.project_name=project_name;
         if (listener == null)
             throw new NullPointerException();
         mLocationCreatedListener = listener;
+        db=LocationDB.getInstance(context);
     }
 
     /**
@@ -102,7 +106,8 @@ public class LocationMaker implements BDLocationListener {
                 || locType == BDLocation.TypeOffLineLocation
                 || locType == BDLocation.TypeOffLineLocationFail
                 || locType == BDLocation.TypeOffLineLocationNetworkFail
-                || locType == BDLocation.TypeServerError) {
+                || locType == BDLocation.TypeServerError
+                || locType == BDLocation.TypeCriteriaException) {
             Log.e(LOG_TAG, "无效定位结果！");
         }else {
             OneLocationRecord record = new OneLocationRecord();
@@ -110,10 +115,11 @@ public class LocationMaker implements BDLocationListener {
             record.setLongitude(longitude);
             record.setTime(System.currentTimeMillis());
             record.setPatrol_name(patrol_name);
+            record.setProject_name(project_name);
             Date date = new Date();
             record.setDate(date);
             //保存数据
-            makeOneLocationRecord(record);
+            db.recordLocation(record);
             Log.e(LOG_TAG, "经纬度");
             Log.e(LOG_TAG, location.getLongitude() + "");
             Log.e(LOG_TAG, location.getLatitude() + "");

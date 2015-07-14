@@ -2,7 +2,6 @@ package dian.org.monitor.gps;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.TimeZone;
 
 /**
  * 一个单独的location的数据
@@ -32,22 +31,26 @@ public class OneLocationRecord {
     //private String addrName;
 
     /**
-     * 是否是时间线的第一个点
+     * 是否有照片在此地拍摄
      */
-    private boolean is_first_of_line;
+    private boolean is_photo_there;
 
     /**
      * 巡视ID
      */
-    private String patrol_name;
+    private int patrol_name;
 
+    /**
+     * 工程名
+     */
+    private String project_name;
 
     //getter---and---setter----------------------------------------------------
-    public String getPatrol_name() {
+    public int getPatrol_name() {
         return patrol_name;
     }
 
-    public void setPatrol_name(String patrol_name) {
+    public void setPatrol_name(int patrol_name) {
         this.patrol_name = patrol_name;
     }
 
@@ -70,14 +73,6 @@ public class OneLocationRecord {
         this.longitude = longitude;
     }
 
-    /*public String getAddrName() {
-        return addrName;
-    }*/
-
-    /*public void setAddrName(String addrName) {
-        this.addrName = addrName;
-    }*/
-
     public double getLatitude() {
         return latitude;
     }
@@ -86,15 +81,19 @@ public class OneLocationRecord {
         this.latitude = latitude;
     }
 
-    public boolean is_first_of_line() {
-        return is_first_of_line;
+    public boolean is_photo_there() {
+        return is_photo_there;
     }
 
-    public void set_first_of_line(boolean is_first_of_line) {
-        this.is_first_of_line = is_first_of_line;
+    public void set_photo_there(boolean is_first_of_line) {
+        this.is_photo_there = is_first_of_line;
     }
 
     public void setTime(long time){this.time=time;}
 
     public long getTime(){return time;}
+
+    public String getProject_name(){return project_name;}
+
+    public void setProject_name(String project_name){this.project_name=project_name;}
 }

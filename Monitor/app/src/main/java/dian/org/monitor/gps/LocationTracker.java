@@ -29,12 +29,13 @@ public class LocationTracker {
     private static int unitTrackingTime = 5000;
     private LocationMaker mLocationMaker;
     private LocationDB mLocationDB;
-    private static String patrol_name;//传入工程的名字
+    private static int patrol_name;//传入工程的id
+    private static String project_name;//传入工程的名字
     private LocationTracker(Context context) {
         //创建一个数据库用来存储---位置数据
         mLocationDB = LocationDB.getInstance(context);
         //创建一个locationMaker用来创建---位置数据
-        mLocationMaker = new LocationMaker(context, unitTrackingTime, patrol_name, new LocationMaker.LocationCreatedListener() {
+        mLocationMaker = new LocationMaker(context, unitTrackingTime, patrol_name,project_name, new LocationMaker.LocationCreatedListener() {
             @Override
             public void onCreated(OneLocationRecord record) {
                 onLocationCreated(record);
@@ -50,9 +51,10 @@ public class LocationTracker {
      *
      * @param context
      */
-    public static void createLocationTracker(Context context,String name) {
+    public static void createLocationTracker(Context context,int id,String name) {
         if (instance == null) {
-            patrol_name=name;
+            patrol_name=id;
+            project_name=name;
             instance = new LocationTracker(context);
         }
     }
@@ -68,7 +70,7 @@ public class LocationTracker {
 
     /**
      * 结束工作。
-     * 结束工作之后，如果想再次开启工作，需要调用{@link #createLocationTracker(Context)}
+     * 结束工作之后，如果想再次开启工作，需要调用{@link #createLocationTracker(Context, int, String)}
      */
     public static void stopWorking() {
         if(instance!=null) {

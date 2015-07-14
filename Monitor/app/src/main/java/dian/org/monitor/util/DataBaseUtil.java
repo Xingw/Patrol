@@ -1,5 +1,7 @@
 package dian.org.monitor.util;
 
+import android.util.Log;
+
 import com.activeandroid.query.Select;
 
 import java.util.List;
@@ -11,6 +13,8 @@ import dian.org.monitor.touritem.TourItem;
  * Created by ssthouse on 2015/7/6.
  */
 public class DataBaseUtil {
+
+    private static final String TAG = "DataBaseUtil";
 
     /**
      * prjName是否已经存在
@@ -84,8 +88,8 @@ public class DataBaseUtil {
             return true;
         }
         //只要有一个相同的---就不行
-        for(TourItem item : itemList){
-            if(item.getTourNumber() == tourNumber){
+        for (TourItem item : itemList) {
+            if (item.getTourNumber() == tourNumber) {
                 return false;
             }
         }
@@ -101,17 +105,17 @@ public class DataBaseUtil {
     public static TourItem getTourItemInDB(TourItem tourItem) {
         String prjName = tourItem.getPrjName();
         int tourNumber = tourItem.getTourNumber();
-        List<TourItem> itemList = new Select().from(TourItem.class)
-                .where("prjName=?", prjName)
-                .where("tourNumber=?", tourNumber)
+        Log.e(TAG, prjName + ":::::" + tourNumber);
+        List<TourItem> list = new Select().from(TourItem.class)
+                .where("prjName=?", tourItem.getPrjName())
                 .execute();
-        if (itemList.size() == 0 || itemList.size() > 1) {
-            return null;
-        } else {
-            return itemList.get(0);
+        for (TourItem item : list) {
+            if (item.getTourNumber() == tourItem.getTourNumber()) {
+                return item;
+            }
         }
+        return null;
     }
-
 
     /**
      * 将TOurItem的数据全部保存下来
@@ -128,4 +132,13 @@ public class DataBaseUtil {
         tourItem.save();
     }
 
+    public static void deleteTourItemAll(TourItem tourItem) {
+        tourItem.getTourInfo().delete();
+        tourItem.getWeatherState().delete();
+        tourItem.getSupportStruct().delete();
+        tourItem.getConstructState().delete();
+        tourItem.getSurroundEnv().delete();
+        tourItem.getMonitorFacility().delete();
+        tourItem.delete();
+    }
 }

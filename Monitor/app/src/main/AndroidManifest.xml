@@ -53,7 +53,7 @@
         <!--百度地图添加的内容-->
         <meta-data
             android:name="com.baidu.lbsapi.API_KEY"
-            android:value="cPGT7wGumTUP9pBXhfTPbCPT" />
+            android:value="rqWl6LyHVadU5BMGpILb0tZO" />
 
         <!--登陆Aty-->
         <activity
@@ -116,7 +116,7 @@
             android:screenOrientation="portrait" />
 
         <activity android:name=".test.PhotoEditAty" />
-
+        <activity android:name=".test.PhotoShow"/>
         <!--定位相关-->
         <service
             android:name="com.baidu.location.f"

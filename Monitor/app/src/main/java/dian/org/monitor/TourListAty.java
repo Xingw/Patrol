@@ -3,14 +3,18 @@ package dian.org.monitor;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
+import dian.org.monitor.gps.LocationDB;
 import dian.org.monitor.gps.LocationTracker;
 import dian.org.monitor.style.TransparentStyle;
 import dian.org.monitor.touritem.ProjectItem;
@@ -26,9 +30,9 @@ public class TourListAty extends Activity {
     private static final String TAG = "TourListAty";
 
     //
-    private final int REQUEST_CODE_EDIT = 1001;
+    public static final int REQUEST_CODE_EDIT = 1001;
 
-    private final int REQUEST_CODE_NEW = 1002;
+    public static final int REQUEST_CODE_NEW = 1002;
 
     /**
      * 所有的数据
@@ -53,6 +57,10 @@ public class TourListAty extends Activity {
     private TextView tvNewTour;
 
     private TourLvAdapter lvAdapter;
+    /**
+     * 一个数据库
+     */
+    private LocationDB db;
 
 
     @Override
@@ -64,6 +72,7 @@ public class TourListAty extends Activity {
         //获取ProjectItem数据
         Intent intent = getIntent();
         projectItem = (ProjectItem) intent.getSerializableExtra(Constant.INTENT_KEY_DATA_PROJECT_ITEM);
+        db=LocationDB.getInstance(this);
         //初始化View
         initView();
     }
@@ -99,14 +108,19 @@ public class TourListAty extends Activity {
                 startActivityForResult(intent, REQUEST_CODE_EDIT);
             }
         });
-
+        // 添加长按点击弹出选择菜单
+        lv.setOnCreateContextMenuListener(new View.OnCreateContextMenuListener() {
+            public void onCreateContextMenu(ContextMenu menu, View v,
+                                            ContextMenu.ContextMenuInfo menuInfo) {
+                menu.setHeaderTitle("选择操作");
+                menu.add(0, 0, 0, "删除该条");
+            }
+        });
         //新建TourItem
         tvNewTour = (TextView) findViewById(R.id.id_tv_new_tour_item);
         tvNewTour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LocationTracker.createLocationTracker(TourListAty.this, "123");
-                LocationTracker.startWorking();
                 Intent intent = new Intent(TourListAty.this, TourEditAty.class);
                 TourItem tourItem = new TourItem(projectItem.getPrjName(),
                         DataBaseUtil.getNewTourNumber(projectItem),
@@ -114,9 +128,12 @@ public class TourListAty extends Activity {
                 //设置创建的时间---也就是唯一的标志
                 tourItem.setTourInfo(
                         new TourInfo("", Calendar.getInstance().getTimeInMillis() + "", ""));
-                //这里需要将它保存进数据库----因为后面的TOurEditAty会从数据库获取他
+                //这里需要将它保存进数据库----因为后面的TourEditAty会从数据库获取他
                 DataBaseUtil.saveTourItemAll(tourItem);
+                LocationTracker.createLocationTracker(TourListAty.this, tourItem.getTourNumber(), tourItem.getPrjName());
+                LocationTracker.startWorking();
                 intent.putExtra(Constant.INTENT_KEY_DATA_TOUR_ITEM, tourItem);
+                intent.putExtra(Constant.INTENT_KEY_REQUEST_CODE, REQUEST_CODE_NEW);
                 startActivityForResult(intent, REQUEST_CODE_NEW);
             }
         });
@@ -138,5 +155,23 @@ public class TourListAty extends Activity {
                 break;
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    //给菜单项添加事件
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        //info.id得到listview中选择的条目绑定的id
+        switch (item.getItemId()) {
+            case 0:
+                Toast.makeText(this, "删除第" + DataBaseUtil.getTourItemList(projectItem).get(info.position).getTourNumber() + "次巡检成功", Toast.LENGTH_SHORT).show();
+                db.Delete_this_id(DataBaseUtil.getTourItemList(projectItem).get(info.position));
+                DataBaseUtil.deleteTourItemAll(DataBaseUtil.getTourItemList(projectItem).get(info.position));
+                lvAdapter = new TourLvAdapter(this, DataBaseUtil.getTourItemList(projectItem));
+                lv.setAdapter(lvAdapter);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 }

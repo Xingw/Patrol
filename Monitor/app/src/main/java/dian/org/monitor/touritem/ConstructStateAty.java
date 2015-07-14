@@ -220,14 +220,14 @@ public class ConstructStateAty extends Activity {
             DialogManager.showInVisiableDialog(this);
         } else if (requestCode == Constant.REQUEST_CODE_CAMERA && null != data) {
             Uri uri = data.getData();
+            String picPath=picturePath + Calendar.getInstance().getTimeInMillis() + ".jpeg";
             if (uri == null) {
                 Log.e(TAG, "拍照的uri是空的!!!");
                 Bundle bundle = data.getExtras();
                 if (bundle != null) {
                     Bitmap photo = (Bitmap) bundle.get("data"); //get bitmap
                     //直接将Bitmap保存到指定路径
-                    PictureManager.saveImage(photo, picturePath +
-                            Calendar.getInstance().getTimeInMillis() + ".jpeg");
+                    PictureManager.saveImage(photo, picPath);
                     //更新界面
                     gridViewAdapter = new GridViewAdapter(this, tourItem,
                             PictureManager.PICTURE_PATH_CONSTRUCT_STATE);
@@ -250,8 +250,7 @@ public class ConstructStateAty extends Activity {
                 String srcPath = cursor.getString(columnIndex);
                 cursor.close();
                 //将照片保存到指定文件夹
-                PictureManager.saveImage(srcPath, picturePath +
-                        Calendar.getInstance().getTimeInMillis() + ".jpeg");
+                PictureManager.saveImage(srcPath, picPath);
                 //更新界面
                 gridViewAdapter = new GridViewAdapter(this, tourItem,
                         PictureManager.PICTURE_PATH_CONSTRUCT_STATE);

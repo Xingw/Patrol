@@ -15,12 +15,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.mapapi.model.LatLng;
+
 import java.util.Calendar;
 
 import dian.org.monitor.Constant;
 import dian.org.monitor.R;
+import dian.org.monitor.gps.LocationDB;
 import dian.org.monitor.style.TransparentStyle;
 import dian.org.monitor.test.PhotoEditAty;
+import dian.org.monitor.test.PhotoLocationDB;
 import dian.org.monitor.util.DialogManager;
 import dian.org.monitor.util.EditTextUtil;
 import dian.org.monitor.util.PictureManager;
@@ -50,6 +54,8 @@ public class MonitorFacilityAty extends Activity {
     private EditText etWorkStateItem3;
 
     private GridViewAdapter gridViewAdapter;
+    private LocationDB db;
+    private PhotoLocationDB pdb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +69,8 @@ public class MonitorFacilityAty extends Activity {
                 + PictureManager.PICTURE_PATH_MONITOR_FACILITY;
         //透明顶栏
         TransparentStyle.setAppToTransparentStyle(this, getResources().getColor(R.color.blue_level0));
+        db= LocationDB.getInstance(this);
+        pdb= PhotoLocationDB.getInstance(this);
         //初始化View
         initView();
     }
@@ -206,14 +214,14 @@ public class MonitorFacilityAty extends Activity {
             DialogManager.showInVisiableDialog(this);
         } else if (requestCode == Constant.REQUEST_CODE_CAMERA && null != data) {
             Uri uri = data.getData();
+            String picPath=picturePath + Calendar.getInstance().getTimeInMillis() + ".jpeg";
             if (uri == null) {
                 Log.e(TAG, "拍照的uri是空的!!!");
                 Bundle bundle = data.getExtras();
                 if (bundle != null) {
                     Bitmap photo = (Bitmap) bundle.get("data"); //get bitmap
                     //直接将Bitmap保存到指定路径
-                    PictureManager.saveImage(photo, picturePath +
-                            Calendar.getInstance().getTimeInMillis() + ".jpeg");
+                    PictureManager.saveImage(photo, picPath);
                     //更新界面
                     gridViewAdapter = new GridViewAdapter(this, tourItem,
                             PictureManager.PICTURE_PATH_MONITOR_FACILITY);
@@ -236,8 +244,7 @@ public class MonitorFacilityAty extends Activity {
                 String srcPath = cursor.getString(columnIndex);
                 cursor.close();
                 //将照片保存到指定文件夹
-                PictureManager.saveImage(srcPath, picturePath +
-                        Calendar.getInstance().getTimeInMillis() + ".jpeg");
+                PictureManager.saveImage(srcPath, picPath);
                 //更新界面
                 gridViewAdapter = new GridViewAdapter(this, tourItem,
                         PictureManager.PICTURE_PATH_MONITOR_FACILITY);
@@ -245,6 +252,8 @@ public class MonitorFacilityAty extends Activity {
                 //改变焦点
                 DialogManager.showInVisiableDialog(this);
             }
+            LatLng latLng=db.getLocations(tourItem.getTourNumber(), tourItem.getPrjName());
+            pdb.recordNewPhoto(latLng.longitude,latLng.latitude,picPath,tourItem.getTourNumber(),tourItem.getPrjName());
         }else if(requestCode == Constant.REQUEST_CODE_EDIT_PICTURE) {
 //            Log.e(TAG, "我冲编辑界面回来了");
             //更新界面

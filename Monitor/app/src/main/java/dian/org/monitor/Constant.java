@@ -45,4 +45,10 @@ public class Constant {
     //保存还是取消
     public static final int RESULT_CODE_SAVE = 20001;
     public static final int RESULT_CODE_CANCEL = 20002;
+
+
+    public static final String  INTENT_KEY_REQUEST_CODE = "requestCode";
+    //定位传值
+    public static final String LATLNG_LONGITUDE="latLng_longitude" ;
+    public static final String LATLNG_LATITUDE="latLng_latitude" ;	
 }

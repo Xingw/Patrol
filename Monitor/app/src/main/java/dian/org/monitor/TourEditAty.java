@@ -18,8 +18,10 @@ import com.gitonway.lee.niftymodaldialogeffects.lib.NiftyDialogBuilder;
 import java.util.Calendar;
 
 import dian.org.monitor.gps.GpsTestAty;
+import dian.org.monitor.gps.LocationDB;
 import dian.org.monitor.gps.LocationTracker;
 import dian.org.monitor.style.TransparentStyle;
+import dian.org.monitor.test.PhotoLocationDB;
 import dian.org.monitor.touritem.ConstructStateAty;
 import dian.org.monitor.touritem.MonitorFacilityAty;
 import dian.org.monitor.touritem.SupportStructAty;
@@ -31,6 +33,7 @@ import dian.org.monitor.util.DataBaseUtil;
 import dian.org.monitor.util.PictureManager;
 import dian.org.monitor.util.StringUtil;
 import dian.org.monitor.util.ToastUtil;
+import dian.org.monitor.util.WordUtil;
 
 /**
  * Created by ssthouse on 2015/6/10.
@@ -51,6 +54,11 @@ public class TourEditAty extends Activity {
     private static final int REQUEST_CODE_MONITOR_FACILITY = 1005;
     //*********************************************
 
+    /**
+     * 一个数据库
+     */
+    private LocationDB db;
+    private PhotoLocationDB pdb;
     /**
      * 修改的数据
      */
@@ -74,6 +82,10 @@ public class TourEditAty extends Activity {
 
     private TextView tvGps;
 
+    private LinearLayout llShare;
+
+    private int Pronumber;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,7 +95,12 @@ public class TourEditAty extends Activity {
         //获取TourItem数据
         Intent intent = getIntent();
         tourItem = (TourItem) intent.getSerializableExtra(Constant.INTENT_KEY_DATA_TOUR_ITEM);
+        Log.e(TAG, tourItem.getPrjName() + ":" + tourItem.getTourNumber());
+        //如果是新建的TourItem----应该是从数据库获取数据
         tourItem = DataBaseUtil.getTourItemInDB(tourItem);
+        db = LocationDB.getInstance(this);
+        pdb=PhotoLocationDB.getInstance(this);
+        Pronumber =tourItem.getTourNumber();
         initView();
     }
 
@@ -243,33 +260,25 @@ public class TourEditAty extends Activity {
         });
 
         //GPS记录数据
-        //TODO ---需要监测---传回来额数据里面有没有GPS的db数据
         tvGps = (TextView) findViewById(R.id.id_tv_gps_state);
-//        if (tourItem.getGps() == null) {
-//        } else {
-//            tvGps.setText("");
-//        }
         LinearLayout llGps = (LinearLayout) findViewById(R.id.id_ll_gps);
         llGps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO
                 //如果有数据---打开Activity---显示GPS数据
                 Intent intent = new Intent(TourEditAty.this, GpsTestAty.class);
                 intent.putExtra(Constant.INTENT_KEY_DATA_TOUR_ITEM, tourItem);
+                intent.putExtra(Constant.INTENT_KEY_REQUEST_CODE, getIntent().getIntExtra(Constant.INTENT_KEY_REQUEST_CODE, 0));
                 startActivityForResult(intent, REQUEST_CODE_MONITOR_FACILITY);
-                //否则---显示Dialog---没有数据
-//                NiftyDialogBuilder dialogBuilder = NiftyDialogBuilder.getInstance(TourEditAty.this);
-//                dialogBuilder.withTitle("提醒")             //.withTitle(null)  no title
-//                        .withTitleColor("#FFFFFF")
-//                        .withDividerColor("#11000000")
-//                        .withMessage("该次巡查没记录GPS数据")//.withMessage(null)  no Msg
-//                        .withMessageColor("#FFFFFFFF")
-//                        .withDialogColor(getResources().getColor(R.color.dialog_color))
-//                        .withEffect(Effectstype.Slidetop)       //def Effectstype.Slidetop
-//                        .isCancelableOnTouchOutside(true)
-//                        .withDuration(400)
-//                        .show();
+            }
+        });
+
+        llShare = (LinearLayout) findViewById(R.id.id_ll_share);
+        llShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WordUtil.generateWordFile(TourEditAty.this, tourItem);
+                WordUtil.sendWordFile(TourEditAty.this, tourItem);
             }
         });
     }
@@ -372,6 +381,16 @@ public class TourEditAty extends Activity {
                     @Override
                     public void onClick(View v) {
                         dialogBuilder.dismiss();
+                        //如果是新建的---且没有保存--直接删除
+                        if (getIntent().getIntExtra(Constant.INTENT_KEY_REQUEST_CODE, 0) ==
+                                TourListAty.REQUEST_CODE_NEW) {
+                            db.Delete_this_id(tourItem);
+                            pdb.Delete_this_id(tourItem);
+                            DataBaseUtil.deleteTourItemAll(tourItem);
+                        } else {
+                            pdb.Update_this_id(tourItem, Pronumber);
+                            db.Update_this_id(tourItem, Pronumber);
+                        }
                         finish();
                     }
                 })
@@ -420,6 +439,8 @@ public class TourEditAty extends Activity {
                                     //更新界面
                                     tvNumber.setText("第 " + number + " 次");
                                     //更新数据
+                                    db.Update_this_id(tourItem, number);
+                                    pdb.Update_this_id(tourItem, number);
                                     tourItem.setTourNumber(number);
                                     dialogBuilder.dismiss();
                                 }

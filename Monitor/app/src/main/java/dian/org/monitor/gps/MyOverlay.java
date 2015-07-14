@@ -50,7 +50,7 @@ public class MyOverlay {
                 .zIndex(9);
         //将覆盖物加到地图上
         mMarker = (Marker) (mBaiduMap.addOverlay(ooA));
-
+        
     }
 
     /**
